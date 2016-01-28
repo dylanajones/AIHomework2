@@ -29,6 +29,7 @@ def search(start_state, goal_state):
     while at_goal != goal_state or num_expand < NMAX:
         current_state = q.get()
         current_state = current_state[1]
+        searched[str(current_state[0])] = 1
         if current_state[0] == goal_state:
             at_goal = True
         else:
@@ -46,7 +47,7 @@ def search(start_state, goal_state):
     return
 # Returns the cost of a state -> travel to cost + hueristic cost
 def cost(state):
-    return 0
+    return state[1] + state[2]
 
 # Makes the goal state based on the number given representing the number of blocks
 def make_goal(num_size):
@@ -75,23 +76,32 @@ num_h = 2
 problem_size = [4,6,8,10]
 NMAX = 1000000
 
-print "This should have 5"
-print make_goal(5)
+#print "This should have 5"
+#print make_goal(5)
 
-D = {}
+#D = {}
 
-D['make_goal(2)'] = 1
+#D['make_goal(2)'] = 1
 
-print D.has_key('a')
-print D.has_key('make_goal(2)')
+#print D.has_key('a')
+#print D.has_key('make_goal(2)')
 
-q = Q.PriorityQueue()
-q.put(-10)
-q.put(-5)
+#q = Q.PriorityQueue()
+#q.put(-10)
+#q.put(-5)
+
+#while not q.empty():
+#    print q.get()
+
+#print str(make_goal(2))
+#print '[[1, 0], [], []]'
+#print str(make_goal(2)) == '[[1, 0], [], []]'
+
+q = Q.PriorityQueue(2)
+
+while q.full() != True:
+    print "Adding to queue"
+    q.put(5)
 
 while not q.empty():
     print q.get()
-
-print str(make_goal(2))
-print '[[1, 0], [], []]'
-print str(make_goal(2)) == '[[1, 0], [], []]'
