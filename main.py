@@ -21,7 +21,7 @@ import time
                 #Record solution length, num of nodes, cpu time
 
 # Function to perform the search NOTE: currently will only work for A* and not beam search
-def search(start_state, goal_state, param):
+def search(start_state, goal_state, param, size):
 
     global NMAX
 
@@ -31,19 +31,23 @@ def search(start_state, goal_state, param):
     searched = {}
 
     # Priority Queue for storing states to expand
-    q = Q.PriorityQueue()
+    if size != 'inf':
+        q = Q.PriorityQueue(size)
+    else:
+        q = Q.PriorityQueue()
 
     # Putting in the start state
     q.put((cost(start_state),start_state))
 
-    while not(at_goal) and num_expand < NMAX:
+    while not(at_goal) and num_expand < NMAX and not(q.empty()):
+
         current_state = q.get() # Pop first item off priority queue
 
         current_state = current_state[1]
 
         if not(searched.has_key(str(current_state[0]))):
 
-            searched[str(current_state[0])] = 1 # Adding in expanded nodes
+            searched[str(current_state[0])] = cost(current_state) # Adding in expanded nodes
             if current_state[0] == goal_state:
                 at_goal = True
             else:
@@ -51,12 +55,22 @@ def search(start_state, goal_state, param):
                 num_expand += 1
                 for item in to_add:
                     if not(searched.has_key(str(item[0][0]))):
-                        q.put((cost(item),item))
-        # Pop from the priority queue - need to limit the size in some way
-        # Check if that node is the goal node
-        # Expand that node
-        # Check if any sucessors in the hash table - if not add them to the hash table
-        # Now evaluate each of the sucessor states
+                        if not(q.full()):
+
+                            q.put((cost(item),item))
+                        else:
+
+                            hold_list = []
+                            while not q.empty():
+                                hold_list.append(q.get())
+
+                            hold_list.append((cost(item),item))
+                            hold_list.sort()
+
+                            for i in range(size):
+                                if not(q.full()):
+                                    q.put(hold_list.pop(0))
+
 
     return [num_expand, current_state]
 
@@ -76,7 +90,7 @@ def make_goal(num_size):
 def expand(current_state, goal_state, param):
     # Making a list to hold all the states created by expanding the current state
     return_list = []
-    # If the first tower is not empty move the top disk on it
+    # If the first tower is not empty move the top disk from it
     if current_state[0][0]:
         for i in range(1,3): # Defining the range to move to
             my_copy = copy.deepcopy(current_state)
@@ -84,10 +98,10 @@ def expand(current_state, goal_state, param):
             to_move = return_list[0][0][0].pop(0) # pop off the disk to move
             return_list[0][0][i].insert(0,to_move) # put the new tile on top of the new tower
             return_list[0][1] = current_state[1] + 1 # update the travel to cost
-            return_list[0][2] = h(return_list[0], goal_state, param) # calculate the hueristic - NOTE: Should figure out how to do this auto - pass a param? only one h functuion then that behaves differently depending on param
+            return_list[0][2] = h(return_list[0], goal_state, param) # calculate the hueristic
             return_list[0][3] = current_state
 
-    # If the second tower is not empty move the top disk on it
+    # If the second tower is not empty move the top disk from it
     if current_state[0][1]:
         for i in [0,2]: # Defining the range to move to
             my_copy = copy.deepcopy(current_state)
@@ -95,10 +109,10 @@ def expand(current_state, goal_state, param):
             to_move = return_list[0][0][1].pop(0) # pop off the disk to move
             return_list[0][0][i].insert(0,to_move) # put the new tile on top of the new tower
             return_list[0][1] = current_state[1] + 1 # update the travel to cost
-            return_list[0][2] = h(return_list[0], goal_state, param) # calculate the hueristic - NOTE: Should figure out how to do this auto - pass a param? only one h functuion then that behaves differently depending on param
+            return_list[0][2] = h(return_list[0], goal_state, param) # calculate the hueristic
             return_list[0][3] = current_state
 
-    # If the third tower is not empty move the top disk on it
+    # If the third tower is not empty move the top disk from it
     if current_state[0][2]:
         for i in range(0,2): # Defining the range to move to
             my_copy = copy.deepcopy(current_state)
@@ -106,7 +120,7 @@ def expand(current_state, goal_state, param):
             to_move = return_list[0][0][2].pop(0) # pop off the disk to move
             return_list[0][0][i].insert(0,to_move) # put the new tile on top of the new tower
             return_list[0][1] = current_state[1] + 1 # update the travel to cost
-            return_list[0][2] = h(return_list[0], goal_state, param) # calculate the hueristic - NOTE: Should figure out how to do this auto - pass a param? only one h functuion then that behaves differently depending on param
+            return_list[0][2] = h(return_list[0], goal_state, param) # calculate the hueristic
             return_list[0][3] = current_state
 
     return return_list
@@ -159,25 +173,36 @@ def main():
     d = load_data(p_size)
     print d
 
+    b = [d[0]] # Code for testing purposes to shorten the amount printed
+
     beam_widths = [5,10,15,20,25,50,100,'inf']
     num_h = 2
     problem_size = [4,6,8,10]
 
+    # Variables to hold results data
+    num_nodes = []
+    time_taken = []
+
     # Loops for running many times - See above
-    for item in d:
+    for item in d: # Change to d for full testing
         # Should add code to write results to a file
         start_state = [[item,[],[]],0,0,[]]
-        print "This is the goal"
-        print make_goal(p_size)
+#        print "This is the goal"
+#        print make_goal(p_size)
         start = time.clock()
-        result = search(start_state, make_goal(p_size),1)
+        result = search(start_state, make_goal(p_size),1,5)
         end = time.clock()
-        print "Number of nodes expanded to get to goal"
-        print result[0]
-        print "Solution to get to the goal"
+#        print "Number of nodes expanded to get to goal"
+#        print result[0]
+        num_nodes.append(result[0])
+#        print "Solution to get to the goal"
         print_solution(result[1])
-        print "Time to get solution"
-        print end - start
+#        print "Time to get solution"
+#        print end - start
+        time_taken.append(end - start)
+
+    print sum(num_nodes) / len(num_nodes)
+    print sum(time_taken) / len(time_taken)
 
 NMAX = 1000000
 print "Starting"
