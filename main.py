@@ -41,15 +41,17 @@ def search(start_state, goal_state, param):
 
         current_state = current_state[1]
 
-        searched[str(current_state[0])] = 1
-        if current_state[0] == goal_state:
-            at_goal = True
-        else:
-            to_add = expand(current_state, goal_state, param)
-            num_expand += 1
-            for item in to_add:
-                if not(searched.has_key(str(item[0][0]))):
-                    q.put((cost(item),item))
+        if not(searched.has_key(str(current_state[0]))):
+
+            searched[str(current_state[0])] = 1 # Adding in expanded nodes
+            if current_state[0] == goal_state:
+                at_goal = True
+            else:
+                to_add = expand(current_state, goal_state, param)
+                num_expand += 1
+                for item in to_add:
+                    if not(searched.has_key(str(item[0][0]))):
+                        q.put((cost(item),item))
         # Pop from the priority queue - need to limit the size in some way
         # Check if that node is the goal node
         # Expand that node
@@ -133,29 +135,49 @@ def print_solution(state):
         print state[0]
         return
 
+# Function to load the data for a given problem size
+def load_data(size):
+    data = []
+
+    f = open(str(size)+'_size.txt','r')
+    for i in range(20):
+        s = f.readline()
+        s = s.replace("\n","")
+        to_add = []
+        for j in range(len(s)):
+            to_add.insert(0,int(s[j]))
+
+        data.append(to_add)
+
+    return data
 
 # Main function, this is what should be called to run everything
 def main():
 
-    # Need to change this to read in from file
-    start_state = [[[0,1,3,4,2],[],[]],0,0,[]]
+    p_size = 4
+
+    d = load_data(p_size)
+    print d
 
     beam_widths = [5,10,15,20,25,50,100,'inf']
     num_h = 2
     problem_size = [4,6,8,10]
 
     # Loops for running many times - See above
-    print "This is the goal"
-    print make_goal(5)
-    start = time.clock()
-    result = search(start_state, make_goal(5),3)
-    end = time.clock()
-    print "Number of nodes expanded to get to goal"
-    print result[0]
-    print "Solution to get to the goal"
-    print_solution(result[1])
-    print "Time to get solution"
-    print end - start
+    for item in d:
+        # Should add code to write results to a file
+        start_state = [[item,[],[]],0,0,[]]
+        print "This is the goal"
+        print make_goal(p_size)
+        start = time.clock()
+        result = search(start_state, make_goal(p_size),1)
+        end = time.clock()
+        print "Number of nodes expanded to get to goal"
+        print result[0]
+        print "Solution to get to the goal"
+        print_solution(result[1])
+        print "Time to get solution"
+        print end - start
 
 NMAX = 1000000
 print "Starting"
