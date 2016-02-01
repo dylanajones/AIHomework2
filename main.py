@@ -9,6 +9,7 @@
 
 import Queue as Q
 import copy
+import time
 
 # State: [[[],[],[]],to_cost,hueristic_cost,parent]
 
@@ -111,7 +112,18 @@ def expand(current_state, goal_state, param):
 # Computes the hueristic for the given state, uses a different hueristic based
 #   on what value is given to param
 def h(current_state, goal_state, param):
-    return len(goal_state[0]) - len(current_state[0][0])
+    num_cor = len(goal_state[0])
+    if param == 1:
+        num_cor = len(goal_state[0]) - len(current_state[0][0])
+    elif param == 2:
+        cur_state = copy.deepcopy(current_state)
+        goal = copy.deepcopy(current_state)
+        while cur_state[0][0] and goal:
+            if cur_state[0][0].pop() == goal.pop():
+                num_cor -= 1
+    else:
+        num_cor = 0
+    return num_cor
 
 def print_solution(state):
     if state[3]:
@@ -125,22 +137,27 @@ def print_solution(state):
 # Main function, this is what should be called to run everything
 def main():
 
-    start_state = [[[2],[0],[1,3,4,5]],0,0,[]]
+    # Need to change this to read in from file
+    start_state = [[[0,1,3,4,2],[],[]],0,0,[]]
 
     beam_widths = [5,10,15,20,25,50,100,'inf']
     num_h = 2
     problem_size = [4,6,8,10]
 
-    # Loops for running many times
+    # Loops for running many times - See above
     print "This is the goal"
-    print make_goal(6)
-    result = search(start_state, make_goal(6),1)
+    print make_goal(5)
+    start = time.clock()
+    result = search(start_state, make_goal(5),3)
+    end = time.clock()
     print "Number of nodes expanded to get to goal"
     print result[0]
     print "Solution to get to the goal"
     print_solution(result[1])
+    print "Time to get solution"
+    print end - start
 
-NMAX = 100000000
+NMAX = 1000000
 print "Starting"
 main()
 
