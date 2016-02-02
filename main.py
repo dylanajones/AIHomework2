@@ -24,17 +24,17 @@ def search(start_state, goal_state, param, size):
     searched = {}
 
     # Priority Queue for storing states to expand
-    if size != 'inf':
-        q = Q.PriorityQueue(size)
-    else:
-        q = Q.PriorityQueue()
+    q = Q.PriorityQueue()
 
     # Putting in the start state
     q.put((cost(start_state),start_state))
-    
+
+    num_in_q = 1
+
     while not(at_goal) and num_expand < NMAX and not(q.empty()):
 
         current_state = q.get() # Pop first item off priority queue
+        num_in_q -= 1
 
         current_state = current_state[1]
 
@@ -45,23 +45,31 @@ def search(start_state, goal_state, param, size):
                 at_goal = True
             else:
                 to_add = expand(current_state, goal_state, param)
+
                 for item in to_add:
-                    if not(searched.has_key(str(item[0][0]))):
+                    if searched.has_key(str(item[0][0])):
+                        to_add.remove(item)
+
+                if num_in_q + len(to_add) <= float(size):
+                    for item in to_add:
+                        q.put((cost(item),item))
+                        num_in_q += 1
+
+                else:
+                    hold_list = []
+                    while not q.empty():
+                        hold_list.append(q.get())
+
+                    for item in to_add:
+                        hold_list.append((cost(item),item))
+
+                    hold_list.sort()
+
+                    num_in_q = 0
+                    for i in range(size):
                         if not(q.full()):
-
-                            q.put((cost(item),item))
-                        else:
-
-                            hold_list = []
-                            while not q.empty():
-                                hold_list.append(q.get())
-
-                            hold_list.append((cost(item),item))
-                            hold_list.sort()
-
-                            for i in range(size):
-                                if not(q.full()):
-                                    q.put(hold_list.pop(0))
+                            q.put(hold_list.pop(0))
+                            num_in_q += 1
 
 
     if at_goal or num_expand == NMAX:
