@@ -1,26 +1,19 @@
 # Code to implement Towers of Corvallis
 
 # TODO:
-#   - Finish first run implementation of Code
-#   - Write Hueristic funnctions
-#   - Implement data loading Code
-#   - Second pass modularization for beam search
-#   - Implement method to store path to goal node / print it out - just have each node store its parent
+
+
+#   - Speed up possible for beam search of a given size
 
 import Queue as Q
 import copy
 import time
+import math
+import cProfile
 
 # State: [[[],[],[]],to_cost,hueristic_cost,parent]
 
-#for i in beam_widths:
-#    for j in range(num_h):
-#        for k in problem_size:
-#            for l in range(20):
-                #Solve the problem using h or until NMAX is reached
-                #Record solution length, num of nodes, cpu time
-
-# Function to perform the search NOTE: currently will only work for A* and not beam search
+# Function to perform the search
 def search(start_state, goal_state, param, size):
 
     global NMAX
@@ -72,7 +65,10 @@ def search(start_state, goal_state, param, size):
                                     q.put(hold_list.pop(0))
 
 
-    return [num_expand, current_state]
+    if at_goal or num_expand == NMAX:
+        return [num_expand, current_state]
+    else:
+        return [float('nan'), current_state]
 
 # Returns the cost of a state -> travel to cost + hueristic cost
 def cost(state):
@@ -128,26 +124,51 @@ def expand(current_state, goal_state, param):
 # Computes the hueristic for the given state, uses a different hueristic based
 #   on what value is given to param
 def h(current_state, goal_state, param):
-    num_cor = len(goal_state[0])
-    if param == 1:
-        num_cor = len(goal_state[0]) - len(current_state[0][0])
-    elif param == 2:
-        cur_state = copy.deepcopy(current_state)
-        goal = copy.deepcopy(current_state)
-        while cur_state[0][0] and goal:
-            if cur_state[0][0].pop() == goal.pop():
-                num_cor -= 1
-    else:
-        num_cor = 0
-    return num_cor
+    est_cost = 0
+    if param == 1: # Addmissible hueristic - relaxed problem of moving any disk anywhere
+        est_cost = len(goal_state[0]) - len(current_state[0][0])
+    elif param == 2: # Inaddmissible hueristic - finding moving cost for each tile and Adding
+        for i in range(len(goal_state[0])):
+            # Calculate how many would need to be moved for this to get to its place
+            pos = goal_state[0].index(i)
+            g_index = pos - len(goal_state[0])
+            if current_state[0][0].count(i) == 0:
+                # Need to find it and Calculate distance - not on goal peg
+                if current_state[0][1].count(i) == 0:
+                    # Tile looking for is on last peg
+                    r_index = current_state[0][2].index(i)
+                else:
+                    # Tile looking for is on the middle peg
+                    r_index = current_state[0][1].index(i)
 
-def print_solution(state):
-    if state[3]:
-        print state[0]
-        print_solution(state[3])
+                if len(current_state[0][0]) < abs(g_index + 1):
+                    r_index += abs(g_index + 1) - len(current_state[0][0])
+                else:
+                    r_index += len(current_state[0][0]) - abs(g_index + 1)
+                add_cost = r_index + 2
+            else:
+                # Need to find how many to remove / move - on goal peg
+                r_index = current_state[0][0].index(i) - len(current_state[0][0])
+                if g_index == r_index:
+                    add_cost = 0
+                elif g_index > r_index:
+                    add_cost = abs(g_index - r_index) + 2
+                else:
+                    add_cost = current_state[0][0].index(i) + abs(g_index - r_index) + 2
+            est_cost += add_cost
     else:
-        print state[0]
-        return
+        est_cost = 0
+    return est_cost
+
+def print_solution(state, flag):
+    if state[3]:
+        if flag == 'v':
+            print state[0]
+        return 1 + print_solution(state[3], flag)
+    else:
+        if flag == 'v':
+            print state[0]
+        return 1
 
 # Function to load the data for a given problem size
 def load_data(size):
@@ -168,51 +189,59 @@ def load_data(size):
 # Main function, this is what should be called to run everything
 def main():
 
-    p_size = 4
-
-    d = load_data(p_size)
-    print d
-
-    b = [d[0]] # Code for testing purposes to shorten the amount printed
+#for i in beam_widths:
+#    for j in range(num_h):
+#        for k in problem_size:
+#            for l in range(20):
 
     beam_widths = [5,10,15,20,25,50,100,'inf']
     num_h = 2
-    problem_size = [4,6,8,10]
+    problem_size = [4]
 
-    # Variables to hold results data
-    num_nodes = []
-    time_taken = []
+    for width in beam_widths:
+        print width
+        for i in range(1,num_h+1):
+            print i
 
-    # Loops for running many times - See above
-    for item in d: # Change to d for full testing
-        # Should add code to write results to a file
-        start_state = [[item,[],[]],0,0,[]]
-#        print "This is the goal"
-#        print make_goal(p_size)
-        start = time.clock()
-        result = search(start_state, make_goal(p_size),1,5)
-        end = time.clock()
-#        print "Number of nodes expanded to get to goal"
-#        print result[0]
-        num_nodes.append(result[0])
-#        print "Solution to get to the goal"
-        print_solution(result[1])
-#        print "Time to get solution"
-#        print end - start
-        time_taken.append(end - start)
+            for size in problem_size:
 
-    print sum(num_nodes) / len(num_nodes)
-    print sum(time_taken) / len(time_taken)
+                d = load_data(size)
+
+                # Variables to hold results data
+                num_nodes = []
+                time_taken = []
+                solution_length = []
+
+                # Loops for running many times - See above
+                for item in d: # Change to d for full testing
+                    # Should add code to write results to a file
+                    start_state = [[item,[],[]],0,0,[]]
+                    print "--------------------------------------------"
+                    start = time.clock()
+                    result = search(start_state, make_goal(size),i,width)
+                    end = time.clock()
+                    if not(math.isnan(result[0])):
+                        num_nodes.append(result[0])
+                        solution_length.append(print_solution(result[1],'n'))
+                        time_taken.append(end - start)
+
+                f = open('output/'+str(size)+'/'+str(i)+'_'+str(width)+'.txt','w')
+                f.write(str(sum(num_nodes, 0.0) / len(num_nodes)))
+                f.write('\n Average number of Nodes\n')
+                print sum(num_nodes, 0.0) / len(num_nodes)
+                f.write(str(sum(time_taken, 0.0) / len(time_taken)))
+                f.write('\n Average Wall Clock time Taken\n')
+                print sum(time_taken, 0.0) / len(time_taken)
+                f.write(str(sum(solution_length, 0.0) / len(solution_length)))
+                f.write('\n Average Solution length\n')
+                print sum(solution_length, 0.0) / len(solution_length)
+                f.write(str(len(d) - len(solution_length)))
+                f.write('\n Number of problem for which no solution was found\n')
+                print len(d) - len(solution_length)
+
+
+    print "**********************************************"
 
 NMAX = 1000000
 print "Starting"
 main()
-
-#q = Q.PriorityQueue(2)
-
-#while q.full() != True:
-#    print "Adding to queue"
-#    q.put(5)
-
-#while not q.empty():
-#    print q.get()
