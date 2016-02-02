@@ -195,16 +195,19 @@ def main():
 
     beam_widths = [5,10,15,20,25,50,100,'inf']
     num_h = 2
-    problem_size = [4,5,6,7,8,9,10]
+    problem_size = [4]
 
-    for width in beam_widths:
-        print width
-        for i in range(1,num_h+1):
-            print i
+    for size in problem_size:
+        d = load_data(size)
+        print "Problem Size"
+        print size
+        for width in beam_widths:
+            print "Width being processed"
+            print width
+            for i in range(1,num_h+1):
+                print "hueristic being used"
+                print i
 
-            for size in problem_size:
-
-                d = load_data(size)
 
                 # Variables to hold results data
                 num_nodes = []
@@ -224,15 +227,22 @@ def main():
                         time_taken.append(end - start)
 
                 f = open('output/'+str(size)+'/'+str(i)+'_'+str(width)+'.txt','w')
-                f.write(str(sum(num_nodes, 0.0) / len(num_nodes)))
-                f.write('\n Average number of Nodes\n')
-                print sum(num_nodes, 0.0) / len(num_nodes)
-                f.write(str(sum(time_taken, 0.0) / len(time_taken)))
-                f.write('\n Average Wall Clock time Taken\n')
-                print sum(time_taken, 0.0) / len(time_taken)
-                f.write(str(sum(solution_length, 0.0) / len(solution_length)))
-                f.write('\n Average Solution length\n')
-                print sum(solution_length, 0.0) / len(solution_length)
+
+                if len(num_nodes) > 0:
+                    f.write(str(sum(num_nodes, 0.0) / len(num_nodes)))
+                    f.write('\n Average number of Nodes\n')
+                    print sum(num_nodes, 0.0) / len(num_nodes)
+
+                if len(time_taken) > 0:
+                    f.write(str(sum(time_taken, 0.0) / len(time_taken)))
+                    f.write('\n Average Wall Clock time Taken\n')
+                    print sum(time_taken, 0.0) / len(time_taken)
+
+                if len(solution_length) > 0:
+                    f.write(str(sum(solution_length, 0.0) / len(solution_length)))
+                    f.write('\n Average Solution length\n')
+                    print sum(solution_length, 0.0) / len(solution_length)
+
                 f.write(str(len(d) - len(solution_length)))
                 f.write('\n Number of problem for which no solution was found\n')
                 print len(d) - len(solution_length)
