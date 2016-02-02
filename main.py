@@ -39,13 +39,12 @@ def search(start_state, goal_state, param, size):
         current_state = current_state[1]
 
         if not(searched.has_key(str(current_state[0]))):
-
+            num_expand += 1
             searched[str(current_state[0])] = cost(current_state) # Adding in expanded nodes
             if current_state[0] == goal_state:
                 at_goal = True
             else:
                 to_add = expand(current_state, goal_state, param)
-                num_expand += 1
                 for item in to_add:
                     if not(searched.has_key(str(item[0][0]))):
                         if not(q.full()):
