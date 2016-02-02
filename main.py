@@ -196,7 +196,7 @@ def main():
 
     beam_widths = [5,10,15,20,25,50,100,'inf']
     num_h = 2
-    problem_size = [4]
+    problem_size = [4,5,6,7,8,9,10]
 
     for width in beam_widths:
         print width
@@ -216,7 +216,6 @@ def main():
                 for item in d: # Change to d for full testing
                     # Should add code to write results to a file
                     start_state = [[item,[],[]],0,0,[]]
-                    print "--------------------------------------------"
                     start = time.clock()
                     result = search(start_state, make_goal(size),i,width)
                     end = time.clock()
