@@ -1,6 +1,6 @@
 260.473684211
  Average number of Nodes
-0.445814157895
+0.432000526316
  Average Wall Clock time Taken
 33.1052631579
  Average Solution length

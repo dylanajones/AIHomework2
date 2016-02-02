@@ -6,7 +6,6 @@
 #   - Speed up possible for beam search of a given size
 
 import Queue as Q
-import copy
 import time
 import math
 import cProfile
@@ -96,7 +95,7 @@ def expand(current_state, goal_state, param):
     # If the first tower is not empty move the top disk from it
     if current_state[0][0]:
         for i in range(1,3): # Defining the range to move to
-            my_copy = copy.deepcopy(current_state)
+            my_copy = copy(current_state)
             return_list.insert(0,my_copy) # Add a new state to the return list
             to_move = return_list[0][0][0].pop(0) # pop off the disk to move
             return_list[0][0][i].insert(0,to_move) # put the new tile on top of the new tower
@@ -107,7 +106,7 @@ def expand(current_state, goal_state, param):
     # If the second tower is not empty move the top disk from it
     if current_state[0][1]:
         for i in [0,2]: # Defining the range to move to
-            my_copy = copy.deepcopy(current_state)
+            my_copy = copy(current_state)
             return_list.insert(0,my_copy) # Add a new state to the return list
             to_move = return_list[0][0][1].pop(0) # pop off the disk to move
             return_list[0][0][i].insert(0,to_move) # put the new tile on top of the new tower
@@ -118,7 +117,7 @@ def expand(current_state, goal_state, param):
     # If the third tower is not empty move the top disk from it
     if current_state[0][2]:
         for i in range(0,2): # Defining the range to move to
-            my_copy = copy.deepcopy(current_state)
+            my_copy = copy(current_state)
             return_list.insert(0,my_copy) # Add a new state to the return list
             to_move = return_list[0][0][2].pop(0) # pop off the disk to move
             return_list[0][0][i].insert(0,to_move) # put the new tile on top of the new tower
@@ -193,6 +192,16 @@ def load_data(size):
 
     return data
 
+def copy(current_state):
+    my_copy = [[]]
+    my_copy[0].append(list(current_state[0][0]))
+    my_copy[0].append(list(current_state[0][1]))
+    my_copy[0].append(list(current_state[0][2]))
+    my_copy.append(current_state[1])
+    my_copy.append(current_state[2])
+    my_copy.append(current_state[3])
+    return my_copy
+
 # Main function, this is what should be called to run everything
 def main():
 
@@ -203,7 +212,7 @@ def main():
 
     beam_widths = [5,10,15,20,25,50,100,'inf']
     num_h = 2
-    problem_size = [4,5,6,7,8,9,10]
+    problem_size = [4]
 
     for size in problem_size:
         d = load_data(size)
@@ -222,9 +231,8 @@ def main():
                 time_taken = []
                 solution_length = []
 
-                # Loops for running many times - See above
-                for item in d: # Change to d for full testing
-                    # Should add code to write results to a file
+                for item in d:
+
                     start_state = [[item,[],[]],0,0,[]]
                     start = time.clock()
                     result = search(start_state, make_goal(size),i,width)

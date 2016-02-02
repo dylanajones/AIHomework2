@@ -195,7 +195,7 @@ def main():
 
     beam_widths = [5,10,15,20,25,50,100,'inf']
     num_h = 2
-    problem_size = [4,5,6,7,8,9,10]
+    problem_size = [4]
 
     for size in problem_size:
         d = load_data(size)
