@@ -1,0 +1,8 @@
+381.8
+ Average number of Nodes
+0.7123802
+ Average Wall Clock time Taken
+17.4
+ Average Solution length
+0
+ Number of problem for which no solution was found

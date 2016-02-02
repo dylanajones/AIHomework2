@@ -31,7 +31,7 @@ def search(start_state, goal_state, param, size):
 
     # Putting in the start state
     q.put((cost(start_state),start_state))
-    
+
     while not(at_goal) and num_expand < NMAX and not(q.empty()):
 
         current_state = q.get() # Pop first item off priority queue
