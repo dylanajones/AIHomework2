@@ -1,6 +1,8 @@
+[117, 120, 113, 132, 99, 1, 183, 223, 120, 125, 35, 208, 182, 35, 168, 54, 220, 10, 178, 243]
+ Number of nodes taken to reach goal state
 128.3
  Average number of Nodes
-0.1729268
+0.04304165
  Average Wall Clock time Taken
 9.7
  Average Solution length

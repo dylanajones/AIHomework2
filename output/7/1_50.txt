@@ -1,0 +1,10 @@
+[19480, 38260, 2152, 29866, 22773, 46329, 18064, 33519, 5523, 27937, 22930, 1266, 20607, 19671, 9992, 8180, 42298, 25675, 28929, 37676]
+ Number of nodes taken to reach goal state
+23056.35
+ Average number of Nodes
+9.46465355
+ Average Wall Clock time Taken
+839.3
+ Average Solution length
+0
+ Number of problem for which no solution was found

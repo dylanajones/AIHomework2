@@ -1,0 +1,10 @@
+[3844, 1067, 3024, 1296, 170, 489, 4539, 3526, 4759, 4521, 3493, 1927, 816, 4270, 3839]
+ Number of nodes taken to reach goal state
+2772.0
+ Average number of Nodes
+0.592222666667
+ Average Wall Clock time Taken
+402.8
+ Average Solution length
+5
+ Number of problem for which no solution was found

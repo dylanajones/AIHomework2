@@ -9,6 +9,7 @@ import Queue as Q
 import time
 import math
 import cProfile
+import sys
 
 # State: [[[],[],[]],to_cost,hueristic_cost,parent]
 
@@ -205,15 +206,15 @@ def copy(current_state):
 # Main function, this is what should be called to run everything
 def main():
 
-#for i in beam_widths:
-#    for j in range(num_h):
-#        for k in problem_size:
-#            for l in range(20):
+    global NMAX
 
-    beam_widths = [5,10,15,20,25,50,100,'inf']
+    #beam_widths = [5,10,15,20,25,50,100,'inf']
+    beam_widths = ['inf']
     num_h = 2
-    problem_size = [4]
+    #problem_size = [4,5,6,7,8,9,10]
+    problem_size = [8,9,10]
 
+    # Loops for running all testing
     for size in problem_size:
         d = load_data(size)
         print "Problem Size"
@@ -239,10 +240,14 @@ def main():
                     end = time.clock()
                     if not(math.isnan(result[0])):
                         num_nodes.append(result[0])
-                        solution_length.append(print_solution(result[1],'n'))
+                        if not(result[0] == NMAX):
+                            solution_length.append(print_solution(result[1],'n'))
                         time_taken.append(end - start)
 
                 f = open('output/'+str(size)+'/'+str(i)+'_'+str(width)+'.txt','w')
+
+                f.write(str(num_nodes))
+                f.write('\n Number of nodes taken to reach goal state\n')
 
                 if len(num_nodes) > 0:
                     f.write(str(sum(num_nodes, 0.0) / len(num_nodes)))
@@ -268,4 +273,5 @@ def main():
 
 NMAX = 1000000
 print "Starting"
+sys.setrecursionlimit(10000)
 main()

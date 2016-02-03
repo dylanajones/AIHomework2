@@ -1,2 +1,4 @@
+[]
+ Number of nodes taken to reach goal state
 20
  Number of problem for which no solution was found

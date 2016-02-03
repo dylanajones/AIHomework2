@@ -1,0 +1,10 @@
+[313513, 148223, 313513, 148223, 313513, 313513, 539821, 313513, 775470, 539821, 313513, 313513, 313513, 64618, 313513, 775470, 313513, 64618, 539821, 148223]
+ Number of nodes taken to reach goal state
+343971.9
+ Average number of Nodes
+57.8377598
+ Average Wall Clock time Taken
+19.0
+ Average Solution length
+0
+ Number of problem for which no solution was found

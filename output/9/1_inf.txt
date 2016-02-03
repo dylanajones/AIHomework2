@@ -1,0 +1,10 @@
+[1000000, 1000000, 1000000, 1000000, 1000000, 1000000, 1000000, 1000000, 1000000, 1000000, 1000000, 28486, 1000000, 1000000, 1000000, 1000000, 1000000, 1000000, 1000000, 1000000]
+ Number of nodes taken to reach goal state
+951424.3
+ Average number of Nodes
+163.7558704
+ Average Wall Clock time Taken
+16.0
+ Average Solution length
+19
+ Number of problem for which no solution was found
