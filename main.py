@@ -208,10 +208,10 @@ def main():
     global NMAX
 
     #beam_widths = [5,10,15,20,25,50,100,'inf']
-    beam_widths = ['inf']
+    beam_widths = [100]
     num_h = 2
     #problem_size = [4,5,6,7,8,9,10]
-    problem_size = [8,9,10]
+    problem_size = [8]
 
     # Loops for running all testing
     for size in problem_size:
