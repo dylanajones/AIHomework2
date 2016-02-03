@@ -1,9 +1,5 @@
 # Code to implement Towers of Corvallis
-
-# TODO:
-
-
-#   - Speed up possible for beam search of a given size
+# Dylan Jones and Lauren Milliken
 
 import Queue as Q
 import time
@@ -31,30 +27,33 @@ def search(start_state, goal_state, param, size):
 
     num_in_q = 1
 
+    # Loop for all constraints - not found goal, not expanded more than possible
+    # nodes and the queue is not empty
     while not(at_goal) and num_expand < NMAX and not(q.empty()):
 
         current_state = q.get() # Pop first item off priority queue
-        num_in_q -= 1
+        num_in_q -= 1 #Tracking number of things in queue
 
         current_state = current_state[1]
 
         if not(searched.has_key(str(current_state[0]))):
             num_expand += 1
             searched[str(current_state[0])] = cost(current_state) # Adding in expanded nodes
+            # If we are at the goal the set goal to true and end the loop
             if current_state[0] == goal_state:
                 at_goal = True
             else:
-                to_add = expand(current_state, goal_state, param)
-
+                to_add = expand(current_state, goal_state, param) #Get all the children
+                # If already expanded do not re add
                 for item in to_add:
                     if searched.has_key(str(item[0][0])):
                         to_add.remove(item)
-
+                # if adding in all children would not exceed our beam add them
                 if num_in_q + len(to_add) <= float(size):
                     for item in to_add:
                         q.put((cost(item),item))
                         num_in_q += 1
-
+                # Handling the case where the frontier will be larger than the width
                 else:
                     hold_list = []
                     while not q.empty():
@@ -74,7 +73,7 @@ def search(start_state, goal_state, param, size):
 
     if at_goal or num_expand == NMAX:
         return [num_expand, current_state]
-    else:
+    else: # Returning NaN if we didnt find a solution
         return [float('nan'), current_state]
 
 # Returns the cost of a state -> travel to cost + hueristic cost
@@ -166,7 +165,7 @@ def h(current_state, goal_state, param):
     else:
         est_cost = 0
     return est_cost
-
+# Function to recursivly print the solution / calculate the solution depth
 def print_solution(state, flag):
     if state[3]:
         if flag == 'v':
@@ -192,7 +191,7 @@ def load_data(size):
         data.append(to_add)
 
     return data
-
+# Function to copy a current state - needed to make a copy by value rather than reference
 def copy(current_state):
     my_copy = [[]]
     my_copy[0].append(list(current_state[0][0]))
@@ -244,6 +243,7 @@ def main():
                             solution_length.append(print_solution(result[1],'n'))
                         time_taken.append(end - start)
 
+                # Opening file and printing results to it
                 f = open('output/'+str(size)+'/'+str(i)+'_'+str(width)+'.txt','w')
 
                 f.write(str(num_nodes))
@@ -273,5 +273,5 @@ def main():
 
 NMAX = 1000000
 print "Starting"
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(10000) # Allowing the system torecurse farther than default
 main()
